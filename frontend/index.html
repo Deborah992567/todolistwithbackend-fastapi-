@@ -7,60 +7,57 @@
 <style>
 body {
   background: linear-gradient(135deg, #141e30 0%, #243b55 100%);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  color: #fff;
+  min-height: 100vh; display: flex; flex-direction: column; color: #fff;
 }
 .hidden { display: none !important; }
 .fade-section { opacity: 0; transform: translateY(40px); transition: all 0.6s ease-in-out; }
 .fade-section.show { opacity: 1; transform: translateY(0); }
 .btn-glow {
-  background: linear-gradient(45deg, #ff512f, #dd2476);
-  border: none;
-  color: #fff;
-  font-weight: bold;
-  transition: 0.3s;
+  background: linear-gradient(45deg, #ff512f, #dd2476); border: none; color: #fff; font-weight: bold; transition: 0.3s;
 }
 .btn-glow:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,81,47,0.7); }
 .auth-card {
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 0 30px rgba(0,0,0,0.4);
+  background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 30px; box-shadow: 0 0 30px rgba(0,0,0,0.4);
 }
 #addTaskBtn { position: fixed; bottom: 25px; right: 25px; z-index: 1500; border-radius: 50%; width: 60px; height: 60px; font-size: 28px; }
 .toast-container { position: fixed; top: 15px; right: 15px; z-index: 2000; }
 .hero {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 20px;
-  background: linear-gradient(135deg, #000428, #004e92);
-  animation: fadeIn 1s ease forwards;
+  height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;
+  background: linear-gradient(135deg, #000428, #004e92); animation: fadeIn 1s ease forwards;
 }
 .hero h1 { font-size: 3rem; font-weight: bold; margin-bottom: 20px; animation: slideDown 1s ease; }
 .hero p { font-size: 1.2rem; margin-bottom: 30px; animation: slideUp 1.2s ease; }
 @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
 @keyframes slideDown { from {transform: translateY(-30px); opacity:0;} to {transform: translateY(0); opacity:1;} }
 @keyframes slideUp { from {transform: translateY(30px); opacity:0;} to {transform: translateY(0); opacity:1;} }
+.modal-content {
+  background: rgba(20, 30, 48, 0.92); backdrop-filter: blur(15px); border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 0 40px rgba(0,0,0,0.6); animation: modalFadeIn 0.35s ease;
+}
+.modal-header {
+  background: linear-gradient(45deg, #ff512f, #dd2476); color: #fff;
+  border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 4px 15px rgba(221,36,118,0.5);
+}
+#taskForm input, #taskForm textarea, #taskForm select {
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #fff;
+}
+#taskForm input:focus, #taskForm textarea:focus, #taskForm select:focus {
+  border-color: #ff512f; box-shadow: 0 0 10px rgba(255,81,47,0.5);
+}
+@keyframes modalFadeIn { from {transform: translateY(-20px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
 </style>
 </head>
 <body>
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-transparent position-absolute w-100">
-<div class="container-fluid">
-  <a class="navbar-brand fw-bold" href="#">✨ Todo App</a>
-  <div class="ms-auto d-flex align-items-center">
-    <span class="text-white me-3" id="userEmail"></span>
-    <button class="btn btn-outline-light hidden" id="logoutBtn">Logout</button>
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#">✨ Todo App</a>
+    <div class="ms-auto d-flex align-items-center">
+      <span class="text-white me-3" id="userEmail"></span>
+      <button class="btn btn-outline-light hidden" id="logoutBtn">Logout</button>
+    </div>
   </div>
-</div>
 </nav>
 
 <!-- Hero Section -->
@@ -101,23 +98,23 @@ body {
 
 <!-- Dashboard Section -->
 <div id="dashboardSection" class="fade-section hidden w-100 mt-5 pt-5">
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3>Your Tasks</h3>
-  <div class="d-flex">
-    <input type="text" id="searchInput" class="form-control form-control-sm me-2" placeholder="🔍 Search tasks">
-    <select id="filterSelect" class="form-select form-select-sm w-auto">
-      <option value="all">All</option>
-      <option value="important">Important</option>
-      <option value="mid">Mid</option>
-      <option value="unimportant">Unimportant</option>
-      <option value="completed">Completed</option>
-      <option value="pending">Pending</option>
-      <option value="due">Sort by Due Date</option>
-    </select>
-    <button class="btn btn-glow btn-sm ms-2" onclick="summarizeTasks()">✨ Summarize All</button>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Your Tasks</h3>
+    <div class="d-flex">
+      <input type="text" id="searchInput" class="form-control form-control-sm me-2" placeholder="🔍 Search tasks">
+      <select id="filterSelect" class="form-select form-select-sm w-auto">
+        <option value="all">All</option>
+        <option value="important">Important</option>
+        <option value="mid">Mid</option>
+        <option value="unimportant">Unimportant</option>
+        <option value="completed">Completed</option>
+        <option value="pending">Pending</option>
+        <option value="due">Sort by Due Date</option>
+      </select>
+      <button class="btn btn-glow btn-sm ms-2" onclick="summarizeTasks()">✨ Summarize All</button>
+    </div>
   </div>
-</div>
-<ul class="list-group shadow" id="taskList"></ul>
+  <ul class="list-group shadow" id="taskList"></ul>
 </div>
 
 <!-- Floating Add Task Button -->
@@ -125,30 +122,30 @@ body {
 
 <!-- Add/Edit Task Modal -->
 <div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
-<div class="modal-dialog">
-  <div class="modal-content bg-dark text-light">
-    <div class="modal-header">
-      <h5 class="modal-title" id="taskModalTitle">Add New Task</h5>
-      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-    </div>
-    <div class="modal-body">
-      <form id="taskForm">
-        <input type="hidden" id="taskId">
-        <div class="mb-3"><label class="form-label">Title</label><input type="text" id="taskTitle" class="form-control" required></div>
-        <div class="mb-3"><label class="form-label">Description</label><textarea id="taskDescription" class="form-control" rows="3"></textarea></div>
-        <div class="mb-3"><label class="form-label">Importance</label>
-          <select id="taskImportance" class="form-select">
-            <option value="important">Important</option>
-            <option value="mid" selected>Mid</option>
-            <option value="unimportant">Unimportant</option>
-          </select>
-        </div>
-        <div class="mb-3"><label class="form-label">Due Date</label><input type="date" id="taskDueDate" class="form-control"></div>
-        <button type="submit" class="btn btn-glow w-100">Save Task</button>
-      </form>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-light">
+      <div class="modal-header">
+        <h5 class="modal-title w-100 text-center" id="taskModalTitle">Add New Task ✨</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="taskForm">
+          <input type="hidden" id="taskId">
+          <div class="mb-3"><label class="form-label">Title</label><input type="text" id="taskTitle" class="form-control" placeholder="Enter task title..." required></div>
+          <div class="mb-3"><label class="form-label">Description</label><textarea id="taskDescription" class="form-control" rows="3" placeholder="What’s this task about?"></textarea></div>
+          <div class="mb-3"><label class="form-label">Importance</label>
+            <select id="taskImportance" class="form-select">
+              <option value="important">🔥 Important</option>
+              <option value="mid" selected>⚡ Mid</option>
+              <option value="unimportant">💤 Unimportant</option>
+            </select>
+          </div>
+          <div class="mb-3"><label class="form-label">Due Date</label><input type="date" id="taskDueDate" class="form-control"></div>
+          <button type="submit" class="btn btn-glow w-100">💾 Save Task</button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 </div>
 
 <!-- Toast Container -->
@@ -168,28 +165,27 @@ async function apiFetch(url,options={}) {
   const token=getToken();
   const headers={"Content-Type":"application/json",...(token&&{"Authorization":"Bearer "+token})};
   const res=await fetch(API_BASE+url,{...options,headers});
-  if(res.status===401){clearTokens();showHero();return;}
-  return await res.json();
+  if(res.status===401){clearTokens();showHero();throw new Error("Unauthorized");}
+  const ct=res.headers.get("content-type")||"";
+  if(res.status===204) return null;
+  const text=await res.text();
+  const data=text? (ct.includes("application/json")? JSON.parse(text) : text) : null;
+  if(!res.ok){throw new Error((data && data.detail) ? data.detail : "Request failed");}
+  return data;
 }
 function showToast(msg){
   const c=document.querySelector(".toast-container");
   const t=document.createElement("div");
   t.className="toast align-items-center text-bg-dark border-0 show mb-2";
-  t.innerHTML=`<div class="d-flex"><div class="toast-body">${msg.replace(/\n/g,'<br>')}</div><button type="button" class="btn-close btn-close-white me-2 m-auto"></button></div>`;
-  c.appendChild(t); 
+  t.innerHTML=`<div class="d-flex"><div class="toast-body">${(msg||"").toString().replace(/\n/g,'<br>')}</div><button type="button" class="btn-close btn-close-white me-2 m-auto"></button></div>`;
+  c.appendChild(t);
   t.querySelector(".btn-close").onclick=()=>t.remove();
   setTimeout(()=>t.remove(),4000);
 }
-function launchConfetti(){
-  confetti({
-    particleCount: 100,
-    spread: 70,
-    origin: { y: 0.6 }
-  });
-}
+function launchConfetti(opts={}){ confetti(Object.assign({particleCount: 120, spread: 70, origin: { y: 0.6 }, colors: ['#ff512f','#dd2476','#24c6dc','#514a9d','#ffffff']}, opts)); }
 
 // ===== Section Control =====
-function showSection(id){["heroSection","signupSection","loginSection","dashboardSection"].forEach(s=>{document.getElementById(s).classList.add("hidden");document.getElementById(s).classList.remove("show");});const sec=document.getElementById(id);sec.classList.remove("hidden");setTimeout(()=>sec.classList.add("show"),50);}
+function showSection(id){["heroSection","signupSection","loginSection","dashboardSection"].forEach(s=>{const el=document.getElementById(s); el.classList.add("hidden"); el.classList.remove("show");}); const sec=document.getElementById(id); sec.classList.remove("hidden"); setTimeout(()=>sec.classList.add("show"),50);}
 function showSignup(){showSection("signupSection");}
 function showLogin(){showSection("loginSection");}
 function showDashboard(){showSection("dashboardSection");document.getElementById("addTaskBtn").classList.remove("hidden");document.getElementById("logoutBtn").classList.remove("hidden");loadTasks();}
@@ -198,47 +194,67 @@ function showHero(){showSection("heroSection");document.getElementById("addTaskB
 // ===== Auth =====
 document.getElementById("signupForm").addEventListener("submit",async e=>{
   e.preventDefault();
-  const email=document.getElementById("signupEmail").value;
+  const email=document.getElementById("signupEmail").value.trim();
   const password=document.getElementById("signupPassword").value;
-  await apiFetch("/auth/signup",{method:"POST",body:JSON.stringify({email,password})});
-  showToast("✅ Account created, now login"); showLogin();
+  try{
+    const res=await apiFetch("/auth/signup",{method:"POST",body:JSON.stringify({email,password})});
+    if(res && res.id){ showToast("✅ Account created, now login"); showLogin(); }
+  }catch(err){ showToast("❌ Signup failed: "+err.message); }
 });
 
 document.getElementById("loginForm").addEventListener("submit",async e=>{
   e.preventDefault();
-  const email=document.getElementById("loginEmail").value;
+  const email=document.getElementById("loginEmail").value.trim();
   const password=document.getElementById("loginPassword").value;
   const formData=new URLSearchParams(); formData.append("username",email); formData.append("password",password);
-  const res=await fetch(API_BASE+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:formData});
-  if(res.ok){const data=await res.json();setTokens(data.access_token,data.refresh_token);document.getElementById("userEmail").innerText=email;showDashboard();showToast("👋 Welcome "+email);}
-  else{showToast("❌ Login failed");}
+  try{
+    const res=await fetch(API_BASE+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:formData});
+    const data=await res.json().catch(()=>null);
+    if(res.ok && data?.access_token && data?.refresh_token){
+      setTokens(data.access_token,data.refresh_token);
+      localStorage.setItem("user_email", email);
+      document.getElementById("userEmail").innerText=email;
+      showDashboard();
+      showToast("👋 Welcome "+email);
+    } else {
+      showToast("❌ Login failed: "+(data?.detail||"Invalid credentials"));
+    }
+  }catch(err){ showToast("❌ Login error: "+err.message); }
 });
 
-document.getElementById("logoutBtn").addEventListener("click",()=>{clearTokens();showHero();});
+document.getElementById("logoutBtn").addEventListener("click",()=>{ clearTokens(); showHero(); });
+
+// ===== Add Button resets form =====
+document.getElementById("addTaskBtn").addEventListener("click", ()=>{document.getElementById("taskForm").reset();document.getElementById("taskId").value="";document.getElementById("taskModalTitle").innerText="Add New Task ✨";});
 
 // ===== Tasks =====
 document.getElementById("taskForm").addEventListener("submit",async e=>{
   e.preventDefault();
   const id=document.getElementById("taskId").value;
-  const title=document.getElementById("taskTitle").value;
-  const desc=document.getElementById("taskDescription").value;
+  const title=document.getElementById("taskTitle").value.trim();
+  const desc=document.getElementById("taskDescription").value.trim();
   const imp=document.getElementById("taskImportance").value;
-  const due=document.getElementById("taskDueDate").value||null;
-  let method='POST',url='/tasks';
-  if(id){method='PUT';url=`/tasks/${id}`;}
-  await apiFetch(url,{method,body:JSON.stringify({title,description:desc,importance:imp,due_date:due})});
-  const modalEl=document.getElementById('taskModal');const modal=bootstrap.Modal.getInstance(modalEl);modal.hide();
-  loadTasks(); showToast(id?"✅ Task updated":"🎉 Task added"); launchConfetti();
+  const due=(document.getElementById("taskDueDate").value||"")||null;
+  if(!title){ showToast("❗ Title is required"); return; }
+
+  const method=id?"PUT":"POST";
+  const url=id?`/tasks/${id}/`:"/tasks/";   // ✅ fixed
+  try{
+    await apiFetch(url,{method,body:JSON.stringify({title,description:desc,importance:imp,due_date:due})});
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('taskModal')).hide();
+    loadTasks();
+    showToast(id?"✅ Task updated":"🎉 Task added");
+    launchConfetti();
+  }catch(err){ showToast("❌ Save failed: "+err.message); }
 });
 
 // ===== Load & Render Tasks =====
-const searchInput = document.getElementById("searchInput");
-const filterSelect = document.getElementById("filterSelect");
-
 async function loadTasks() {
-  const tasks = await apiFetch("/tasks");
-  allTasks = tasks || [];
-  renderTasks();
+  try{
+    const tasks = await apiFetch("/tasks/");   // ✅ fixed
+    allTasks = Array.isArray(tasks) ? tasks : [];
+    renderTasks();
+  }catch(err){ showToast("⚠️ Could not load tasks: "+err.message); }
 }
 
 function renderTasks() {
@@ -253,8 +269,8 @@ function renderTasks() {
   else if(filter === "pending") filtered = filtered.filter(t => !t.completed);
   else if(filter === "due") filtered = filtered.sort((a,b) => (a.due_date||"").localeCompare(b.due_date||""));
 
-  const search = searchInput.value.toLowerCase();
-  if(search) filtered = filtered.filter(t => t.title.toLowerCase().includes(search) || (t.description||"").toLowerCase().includes(search));
+  const search = (searchInput.value||"").toLowerCase();
+  if(search) filtered = filtered.filter(t => (t.title||"").toLowerCase().includes(search) || (t.description||"").toLowerCase().includes(search));
 
   filtered.forEach(t => {
     const li = document.createElement("li");
@@ -276,49 +292,53 @@ function renderTasks() {
 
 // ===== Task Actions =====
 function editTask(id){
-  const t=allTasks.find(x=>x.id===id);
-  document.getElementById("taskId").value=t.id;
-  document.getElementById("taskTitle").value=t.title;
-  document.getElementById("taskDescription").value=t.description||"";
-  document.getElementById("taskImportance").value=t.importance;
-  document.getElementById("taskDueDate").value=t.due_date||"";
-  const modal=new bootstrap.Modal(document.getElementById("taskModal")); modal.show();
+  const t = allTasks.find(x => x.id===id);
+  if(!t) return;
+  document.getElementById("taskId").value = t.id;
+  document.getElementById("taskTitle").value = t.title;
+  document.getElementById("taskDescription").value = t.description || "";
+  document.getElementById("taskImportance").value = t.importance || "mid";
+  if(t.due_date) document.getElementById("taskDueDate").value = t.due_date;
+  document.getElementById("taskModalTitle").innerText = "Edit Task ✍️";
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('taskModal')).show();
 }
 
 async function deleteTask(id){
   if(!confirm("Are you sure you want to delete this task?")) return;
-  await apiFetch(`/tasks/${id}`,{method:"DELETE"});
-  loadTasks(); showToast("🗑️ Task deleted");
+  try{
+    await apiFetch(`/tasks/${id}/`,{method:"DELETE"});   // ✅ fixed
+    loadTasks(); showToast("🗑️ Task deleted");
+  }catch(err){ showToast("❌ Delete failed: "+err.message); }
 }
 
 async function toggleComplete(id) {
   const task = allTasks.find(t => t.id === id);
   if(!task) return;
-  await apiFetch(`/tasks/${id}`, {
-    method: "PUT",
-    body: JSON.stringify({ completed: !task.completed })
-  });
-  if(!task.completed){showToast("🎯 Task marked done!"); launchConfetti();}
-  else{showToast("↩️ Task undone");}
-  loadTasks();
+  try{
+    await apiFetch(`/tasks/${id}/`, { method: "PUT", body: JSON.stringify({ completed: !task.completed }) });  // ✅ fixed
+    if(!task.completed){ showToast("🎯 Task marked done!"); launchConfetti(); }
+    else{ showToast("↩️ Task undone"); }
+    task.completed = !task.completed;
+    renderTasks();
+    loadTasks();
+  }catch(err){ showToast("❌ Update failed: "+err.message); }
 }
 
-function summarizeTasks(){
-  const total=allTasks.length;
-  const completed=allTasks.filter(t=>t.completed).length;
-  const pending=total-completed;
-  const important=allTasks.filter(t=>t.importance==="important").length;
-  const mid=allTasks.filter(t=>t.importance==="mid").length;
-  const unimportant=allTasks.filter(t=>t.importance==="unimportant").length;
-  showToast(`📊 Summary\nTotal: ${total}\nCompleted: ${completed}\nPending: ${pending}\nImportant: ${important}\nMid: ${mid}\nUnimportant: ${unimportant}`);
+// ===== Summarize (mock AI) =====
+async function summarizeTasks(){
+  if(!allTasks.length){ showToast("No tasks to summarize"); return; }
+  let summary="Summary:\n";
+  const imp=allTasks.filter(t=>t.importance==="important").length;
+  const done=allTasks.filter(t=>t.completed).length;
+  const pend=allTasks.length-done;
+  summary+=`Total: ${allTasks.length}, Important: ${imp}, Completed: ${done}, Pending: ${pend}`;
+  showToast(summary);
 }
-
-// ===== Event Listeners =====
-searchInput.addEventListener("input", renderTasks);
-filterSelect.addEventListener("change", renderTasks);
 
 // ===== Init =====
-document.addEventListener("DOMContentLoaded",()=>{if(getToken()){showDashboard();} else {showHero();}});
+document.getElementById("searchInput").addEventListener("input",renderTasks);
+document.getElementById("filterSelect").addEventListener("change",renderTasks);
+if(getToken()){document.getElementById("userEmail").innerText=localStorage.getItem("user_email")||"";showDashboard();} else {showHero();}
 </script>
 </body>
 </html>
