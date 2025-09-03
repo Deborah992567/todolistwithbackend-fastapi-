@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Todo App</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body {
+  background: linear-gradient(135deg, #141e30 0%, #243b55 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+.hidden { display: none !important; }
+.fade-section { opacity: 0; transform: translateY(40px); transition: all 0.6s ease-in-out; }
+.fade-section.show { opacity: 1; transform: translateY(0); }
+.btn-glow {
+  background: linear-gradient(45deg, #ff512f, #dd2476);
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  transition: 0.3s;
+}
+.btn-glow:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,81,47,0.7); }
+.auth-card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.4);
+}
+#addTaskBtn { position: fixed; bottom: 25px; right: 25px; z-index: 1500; border-radius: 50%; width: 60px; height: 60px; font-size: 28px; }
+.toast-container { position: fixed; top: 15px; right: 15px; z-index: 2000; }
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #000428, #004e92);
+  animation: fadeIn 1s ease forwards;
+}
+.hero h1 { font-size: 3rem; font-weight: bold; margin-bottom: 20px; animation: slideDown 1s ease; }
+.hero p { font-size: 1.2rem; margin-bottom: 30px; animation: slideUp 1.2s ease; }
+@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+@keyframes slideDown { from {transform: translateY(-30px); opacity:0;} to {transform: translateY(0); opacity:1;} }
+@keyframes slideUp { from {transform: translateY(30px); opacity:0;} to {transform: translateY(0); opacity:1;} }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-transparent position-absolute w-100">
+<div class="container-fluid">
+  <a class="navbar-brand fw-bold" href="#">✨ Todo App</a>
+  <div class="ms-auto d-flex align-items-center">
+    <span class="text-white me-3" id="userEmail"></span>
+    <button class="btn btn-outline-light hidden" id="logoutBtn">Logout</button>
+  </div>
+</div>
+</nav>
+
+<!-- Hero Section -->
+<div id="heroSection" class="hero fade-section show">
+  <h1>Organize Your Life ✨</h1>
+  <p>Simplify your todos with AI, reminders, and beautiful design.</p>
+  <div>
+    <button class="btn btn-glow me-2" onclick="showSignup()">Get Started</button>
+    <button class="btn btn-outline-light" onclick="showLogin()">Login</button>
+  </div>
+</div>
+
+<!-- Signup Section -->
+<div id="signupSection" class="fade-section hidden d-flex justify-content-center align-items-center flex-column">
+  <div class="auth-card" style="max-width:400px;">
+    <h3 class="mb-3 text-center">Create Account</h3>
+    <form id="signupForm">
+      <div class="mb-3"><input type="email" id="signupEmail" class="form-control" placeholder="Email" required></div>
+      <div class="mb-3"><input type="password" id="signupPassword" class="form-control" placeholder="Password" required></div>
+      <button class="btn btn-glow w-100">Sign Up</button>
+    </form>
+    <p class="mt-3 text-center">Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+  </div>
+</div>
+
+<!-- Login Section -->
+<div id="loginSection" class="fade-section hidden d-flex justify-content-center align-items-center flex-column">
+  <div class="auth-card" style="max-width:400px;">
+    <h3 class="mb-3 text-center">Login</h3>
+    <form id="loginForm">
+      <div class="mb-3"><input type="email" id="loginEmail" class="form-control" placeholder="Email" required></div>
+      <div class="mb-3"><input type="password" id="loginPassword" class="form-control" placeholder="Password" required></div>
+      <button class="btn btn-glow w-100">Login</button>
+    </form>
+    <p class="mt-3 text-center">New here? <a href="#" onclick="showSignup()">Sign up</a></p>
+  </div>
+</div>
+
+<!-- Dashboard Section -->
+<div id="dashboardSection" class="fade-section hidden w-100 mt-5 pt-5">
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Your Tasks</h3>
+  <div class="d-flex">
+    <input type="text" id="searchInput" class="form-control form-control-sm me-2" placeholder="🔍 Search tasks">
+    <select id="filterSelect" class="form-select form-select-sm w-auto">
+      <option value="all">All</option>
+      <option value="important">Important</option>
+      <option value="mid">Mid</option>
+      <option value="unimportant">Unimportant</option>
+      <option value="completed">Completed</option>
+      <option value="pending">Pending</option>
+      <option value="due">Sort by Due Date</option>
+    </select>
+    <button class="btn btn-glow btn-sm ms-2" onclick="summarizeTasks()">✨ Summarize All</button>
+  </div>
+</div>
+<ul class="list-group shadow" id="taskList"></ul>
+</div>
+
+<!-- Floating Add Task Button -->
+<button id="addTaskBtn" class="btn btn-light shadow-lg hidden" data-bs-toggle="modal" data-bs-target="#taskModal">+</button>
+
+<!-- Add/Edit Task Modal -->
+<div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog">
+  <div class="modal-content bg-dark text-light">
+    <div class="modal-header">
+      <h5 class="modal-title" id="taskModalTitle">Add New Task</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body">
+      <form id="taskForm">
+        <input type="hidden" id="taskId">
+        <div class="mb-3"><label class="form-label">Title</label><input type="text" id="taskTitle" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Description</label><textarea id="taskDescription" class="form-control" rows="3"></textarea></div>
+        <div class="mb-3"><label class="form-label">Importance</label>
+          <select id="taskImportance" class="form-select">
+            <option value="important">Important</option>
+            <option value="mid" selected>Mid</option>
+            <option value="unimportant">Unimportant</option>
+          </select>
+        </div>
+        <div class="mb-3"><label class="form-label">Due Date</label><input type="date" id="taskDueDate" class="form-control"></div>
+        <button type="submit" class="btn btn-glow w-100">Save Task</button>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+const API_BASE="http://127.0.0.1:8000";
+let allTasks=[];
+
+// ===== Helpers =====
+function getToken(){return localStorage.getItem("access_token");}
+function setTokens(a,r){localStorage.setItem("access_token",a);localStorage.setItem("refresh_token",r);}
+function clearTokens(){localStorage.clear();}
+async function apiFetch(url,options={}) {
+  const token=getToken();
+  const headers={"Content-Type":"application/json",...(token&&{"Authorization":"Bearer "+token})};
+  const res=await fetch(API_BASE+url,{...options,headers});
+  if(res.status===401){clearTokens();showHero();return;}
+  return await res.json();
+}
+function showToast(msg){
+  const c=document.querySelector(".toast-container");
+  const t=document.createElement("div");
+  t.className="toast align-items-center text-bg-dark border-0 show mb-2";
+  t.innerHTML=`<div class="d-flex"><div class="toast-body">${msg.replace(/\n/g,'<br>')}</div><button type="button" class="btn-close btn-close-white me-2 m-auto"></button></div>`;
+  c.appendChild(t); 
+  t.querySelector(".btn-close").onclick=()=>t.remove();
+  setTimeout(()=>t.remove(),4000);
+}
+function launchConfetti(){
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6 }
+  });
+}
+
+// ===== Section Control =====
+function showSection(id){["heroSection","signupSection","loginSection","dashboardSection"].forEach(s=>{document.getElementById(s).classList.add("hidden");document.getElementById(s).classList.remove("show");});const sec=document.getElementById(id);sec.classList.remove("hidden");setTimeout(()=>sec.classList.add("show"),50);}
+function showSignup(){showSection("signupSection");}
+function showLogin(){showSection("loginSection");}
+function showDashboard(){showSection("dashboardSection");document.getElementById("addTaskBtn").classList.remove("hidden");document.getElementById("logoutBtn").classList.remove("hidden");loadTasks();}
+function showHero(){showSection("heroSection");document.getElementById("addTaskBtn").classList.add("hidden");document.getElementById("logoutBtn").classList.add("hidden");}
+
+// ===== Auth =====
+document.getElementById("signupForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const email=document.getElementById("signupEmail").value;
+  const password=document.getElementById("signupPassword").value;
+  await apiFetch("/auth/signup",{method:"POST",body:JSON.stringify({email,password})});
+  showToast("✅ Account created, now login"); showLogin();
+});
+
+document.getElementById("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const email=document.getElementById("loginEmail").value;
+  const password=document.getElementById("loginPassword").value;
+  const formData=new URLSearchParams(); formData.append("username",email); formData.append("password",password);
+  const res=await fetch(API_BASE+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:formData});
+  if(res.ok){const data=await res.json();setTokens(data.access_token,data.refresh_token);document.getElementById("userEmail").innerText=email;showDashboard();showToast("👋 Welcome "+email);}
+  else{showToast("❌ Login failed");}
+});
+
+document.getElementById("logoutBtn").addEventListener("click",()=>{clearTokens();showHero();});
+
+// ===== Tasks =====
+document.getElementById("taskForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const id=document.getElementById("taskId").value;
+  const title=document.getElementById("taskTitle").value;
+  const desc=document.getElementById("taskDescription").value;
+  const imp=document.getElementById("taskImportance").value;
+  const due=document.getElementById("taskDueDate").value||null;
+  let method='POST',url='/tasks';
+  if(id){method='PUT';url=`/tasks/${id}`;}
+  await apiFetch(url,{method,body:JSON.stringify({title,description:desc,importance:imp,due_date:due})});
+  const modalEl=document.getElementById('taskModal');const modal=bootstrap.Modal.getInstance(modalEl);modal.hide();
+  loadTasks(); showToast(id?"✅ Task updated":"🎉 Task added"); launchConfetti();
+});
+
+// ===== Load & Render Tasks =====
+const searchInput = document.getElementById("searchInput");
+const filterSelect = document.getElementById("filterSelect");
+
+async function loadTasks() {
+  const tasks = await apiFetch("/tasks");
+  allTasks = tasks || [];
+  renderTasks();
+}
+
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  list.innerHTML = "";
+  let filtered = [...allTasks];
+  const filter = filterSelect.value;
+  if(filter === "important") filtered = filtered.filter(t => t.importance === "important");
+  else if(filter === "mid") filtered = filtered.filter(t => t.importance === "mid");
+  else if(filter === "unimportant") filtered = filtered.filter(t => t.importance === "unimportant");
+  else if(filter === "completed") filtered = filtered.filter(t => t.completed);
+  else if(filter === "pending") filtered = filtered.filter(t => !t.completed);
+  else if(filter === "due") filtered = filtered.sort((a,b) => (a.due_date||"").localeCompare(b.due_date||""));
+
+  const search = searchInput.value.toLowerCase();
+  if(search) filtered = filtered.filter(t => t.title.toLowerCase().includes(search) || (t.description||"").toLowerCase().includes(search));
+
+  filtered.forEach(t => {
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-start bg-dark text-light mb-2 rounded";
+    li.innerHTML = `
+      <div>
+        <div class="fw-bold">${t.title} <span class="badge bg-info">${t.importance}</span> ${t.completed?"✅":""}</div>
+        <div>${t.description||""}</div>
+        <small>Due: ${t.due_date||"N/A"}</small>
+      </div>
+      <div>
+        <button class="btn btn-sm btn-success me-1" onclick="editTask(${t.id})">Edit</button>
+        <button class="btn btn-sm btn-danger me-1" onclick="deleteTask(${t.id})">Delete</button>
+        <button class="btn btn-sm btn-warning" onclick="toggleComplete(${t.id})">${t.completed?"Undo":"Done"}</button>
+      </div>`;
+    list.appendChild(li);
+  });
+}
+
+// ===== Task Actions =====
+function editTask(id){
+  const t=allTasks.find(x=>x.id===id);
+  document.getElementById("taskId").value=t.id;
+  document.getElementById("taskTitle").value=t.title;
+  document.getElementById("taskDescription").value=t.description||"";
+  document.getElementById("taskImportance").value=t.importance;
+  document.getElementById("taskDueDate").value=t.due_date||"";
+  const modal=new bootstrap.Modal(document.getElementById("taskModal")); modal.show();
+}
+
+async function deleteTask(id){
+  if(!confirm("Are you sure you want to delete this task?")) return;
+  await apiFetch(`/tasks/${id}`,{method:"DELETE"});
+  loadTasks(); showToast("🗑️ Task deleted");
+}
+
+async function toggleComplete(id) {
+  const task = allTasks.find(t => t.id === id);
+  if(!task) return;
+  await apiFetch(`/tasks/${id}`, {
+    method: "PUT",
+    body: JSON.stringify({ completed: !task.completed })
+  });
+  if(!task.completed){showToast("🎯 Task marked done!"); launchConfetti();}
+  else{showToast("↩️ Task undone");}
+  loadTasks();
+}
+
+function summarizeTasks(){
+  const total=allTasks.length;
+  const completed=allTasks.filter(t=>t.completed).length;
+  const pending=total-completed;
+  const important=allTasks.filter(t=>t.importance==="important").length;
+  const mid=allTasks.filter(t=>t.importance==="mid").length;
+  const unimportant=allTasks.filter(t=>t.importance==="unimportant").length;
+  showToast(`📊 Summary\nTotal: ${total}\nCompleted: ${completed}\nPending: ${pending}\nImportant: ${important}\nMid: ${mid}\nUnimportant: ${unimportant}`);
+}
+
+// ===== Event Listeners =====
+searchInput.addEventListener("input", renderTasks);
+filterSelect.addEventListener("change", renderTasks);
+
+// ===== Init =====
+document.addEventListener("DOMContentLoaded",()=>{if(getToken()){showDashboard();} else {showHero();}});
+</script>
+</body>
+</html>
