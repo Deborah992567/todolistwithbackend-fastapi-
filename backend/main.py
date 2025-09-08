@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
 from database import Base, engine
 from routers import users, tasks, ai
@@ -25,3 +26,14 @@ app.include_router(ai.router)
 @app.get("/")
 def root():
     return {"ok": True, "service": "todo-api"}
+
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
