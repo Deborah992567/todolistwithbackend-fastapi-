@@ -45,17 +45,32 @@ body {
   border-color: #ff512f; box-shadow: 0 0 10px rgba(255,81,47,0.5);
 }
 @keyframes modalFadeIn { from {transform: translateY(-20px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+
+/* === Responsive Tweaks === */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2.2rem; }
+  .hero p { font-size: 1rem; }
+  .auth-card { width: 90%; padding: 20px; }
+}
 </style>
 </head>
+
 <body>
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-transparent position-absolute w-100">
   <div class="container-fluid">
     <a class="navbar-brand fw-bold" href="#">✨ Todo App</a>
-    <div class="ms-auto d-flex align-items-center">
-      <span class="text-white me-3" id="userEmail"></span>
-      <button class="btn btn-outline-light hidden" id="logoutBtn">Logout</button>
+    <!-- Hamburger -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Collapsible Content -->
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <div class="ms-auto d-flex align-items-center">
+        <span class="text-white me-3" id="userEmail"></span>
+        <button class="btn btn-outline-light hidden" id="logoutBtn">Logout</button>
+      </div>
     </div>
   </div>
 </nav>
@@ -98,11 +113,11 @@ body {
 
 <!-- Dashboard Section -->
 <div id="dashboardSection" class="fade-section hidden w-100 mt-5 pt-5">
-  <div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
     <h3>Your Tasks</h3>
-    <div class="d-flex">
-      <input type="text" id="searchInput" class="form-control form-control-sm me-2" placeholder="🔍 Search tasks">
-      <select id="filterSelect" class="form-select form-select-sm w-auto">
+    <div class="d-flex flex-wrap mt-2 mt-lg-0">
+      <input type="text" id="searchInput" class="form-control form-control-sm me-2 mb-2 mb-lg-0" placeholder="🔍 Search tasks">
+      <select id="filterSelect" class="form-select form-select-sm w-auto mb-2 mb-lg-0">
         <option value="all">All</option>
         <option value="important">Important</option>
         <option value="mid">Mid</option>
